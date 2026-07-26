@@ -84,7 +84,7 @@ An autonomous, query-aware AML (Anti-Money Laundering) compliance agent. Instead
 ### 7 · Raw JSON Inspector
 > *The complete `ExecutionReport` — plan, skip reasons, scores, features — always one click away from anywhere in the app.*
 
-![JSON Inspector](screenshots/11-json-inspector.png)
+![JSON Inspector](screenshots/image copy 13.png)
 
 ---
 
