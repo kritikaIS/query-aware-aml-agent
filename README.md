@@ -58,10 +58,10 @@ An autonomous, query-aware AML (Anti-Money Laundering) compliance agent. Instead
 
 ---
 
-### 4 · Charts — Amount Histogram & Activity Timeline
-> *Amount distribution with the $10,000 reporting threshold line always visible. Timeline scatter: point size = transaction amount.*
+### 4 · Raw JSON Inspector
+> *The complete `ExecutionReport` — plan, skip reasons, scores, features — always one click away from anywhere in the app.*
 
-![Charts Rail](screenshots/13-results-charts.png)
+![JSON Inspector](screenshots/13-results-charts.png)
 
 ---
 
