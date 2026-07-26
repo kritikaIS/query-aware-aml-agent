@@ -25,15 +25,66 @@ An autonomous, query-aware AML (Anti-Money Laundering) compliance agent. Instead
 
 ## Screenshots
 
-> _Add screenshots here after first run._
->
-> Suggested captures:
-> - `screenshots/01-query-console.png` — Query Console with quick-select chips
-> - `screenshots/02-plan-visualizer.png` — Live Plan Visualizer with tool cards and skip reason
-> - `screenshots/03-results-dashboard.png` — Results Dashboard with KPI tiles and entity table
-> - `screenshots/04-entity-drawer.png` — Entity Deep-Dive Drawer
-> - `screenshots/05-json-inspector.png` — Raw JSON Inspector
-> - `screenshots/06-network-graph.png` — Entity Risk Network
+---
+
+### 1 · Query Console
+> *Ask the agent anything. Quick-select chips load the three reference investigation types in one click.*
+
+![Query Console](screenshots/01-query-console.png)
+
+![Query Console — chip selected](screenshots/02-query-console-chip.png)
+
+---
+
+### 2 · Live Plan Visualizer — The Key Screen
+> *The agent's decision made visible. Tool cards animate in execution order. Skipped tools appear greyed with the reason shown — no hover required.*
+
+![Plan Visualizer](screenshots/03-plan-visualizer.png)
+
+![Plan Visualizer — tools running](screenshots/04-plan-visualizer-2.png)
+
+![Plan Visualizer — execution in progress](screenshots/05-plan-visualizer-running.png)
+
+---
+
+### 3 · Results Dashboard
+> *KPI tiles count up from 0 on entry. Risk donut filters the entity table on click. Every number traces back to the raw JSON.*
+
+![Results Dashboard](screenshots/06-results-dashboard.png)
+
+![Results — flagged entity table](screenshots/08-results-table.png)
+
+![Results — top bar and summary](screenshots/10-results-topbar.png)
+
+---
+
+### 4 · Charts — Amount Histogram & Activity Timeline
+> *Amount distribution with the $10,000 reporting threshold line always visible. Timeline scatter: point size = transaction amount.*
+
+![Charts Rail](screenshots/13-results-charts.png)
+
+---
+
+### 5 · Entity Risk Network
+> *D3 force-directed graph. Nodes sized by risk score, coloured by risk band, clustered by AML pattern.*
+
+![Entity Risk Network](screenshots/12-network-graph.png)
+
+---
+
+### 6 · Entity Deep-Dive Drawer
+> *Click any flagged entity. SVG risk gauge sweeps to the score. Feature contribution bars animate in. Plain-English explanation with the numbers underlined.*
+
+![Entity Drawer](screenshots/07-entity-drawer.png)
+
+![Entity Drawer — detail](screenshots/09-entity-drawer-2.png)
+
+---
+
+### 7 · Raw JSON Inspector
+> *The complete `ExecutionReport` — plan, skip reasons, scores, features — always one click away from anywhere in the app.*
+
+![JSON Inspector](screenshots/11-json-inspector.png)
 
 ---
 
