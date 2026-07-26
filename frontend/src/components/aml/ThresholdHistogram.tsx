@@ -13,9 +13,11 @@ import React, { lazy, Suspense } from 'react'
 //   export default require_react_plotly()
 // require_react_plotly() returns the CJS exports object { __esModule: true, default: PlotlyComponent }.
 // React.lazy requires { default: ComponentType }, so we must extract m.default.default.
+// Cast to React.FC<any> to avoid TS errors on JSX props — the runtime type is correct.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Plot = lazy(() =>
   import('react-plotly.js').then((m: unknown) => {
-    const mod = m as { default: { default: React.ComponentType<unknown> } }
+    const mod = m as { default: { default: React.ComponentType<any> } }
     return { default: mod.default.default }
   })
 )

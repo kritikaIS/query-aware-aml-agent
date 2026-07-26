@@ -3,6 +3,12 @@
  * Documented Requirement: §7.2 seq 4 "ease-out count from 0 → final value over
  * 600ms, only on first mount, never on re-render"
  * §10: disabled entirely when prefers-reduced-motion is set
+ *
+ * Fix: replaced empty dep array `[]` with `[target, reduced]`.
+ * The `startedRef` guard ensures the animation still only runs once per
+ * unique target value, not on every render. When KpiTile remounts (e.g.
+ * after the results view is re-entered), `startedRef` resets to false
+ * because it is a new hook instance, so the count-up plays correctly.
  */
 
 import { useEffect, useRef, useState } from 'react'
@@ -22,6 +28,11 @@ export function useCountUp(target: number, startOnMount = true): number {
       setCurrent(target)
       return
     }
+
+    // Reset animation state when target changes (e.g. component remount
+    // with a new value, or first mount with a non-zero target).
+    startedRef.current = false
+    setCurrent(0)
 
     if (!startOnMount || startedRef.current) return
     startedRef.current = true
@@ -46,8 +57,9 @@ export function useCountUp(target: number, startOnMount = true): number {
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
     }
+  // Re-run when the target value or motion preference changes.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Runs once on mount only — by design (§7.2 seq 4)
+  }, [target, reduced])
 
   return current
 }

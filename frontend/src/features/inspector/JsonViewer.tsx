@@ -18,9 +18,11 @@ import { cn } from '@/utils'
 //   m.default = CJS exports object t = { __esModule: true, default: Be, ... }
 //   m.default.default = Be = the actual React PureComponent class
 // React.lazy requires { default: ComponentType }, so we extract m.default.default.
+// Cast to React.FC<any> to avoid TS errors on JSX props — the runtime type is correct.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactJson = lazy(() =>
   import('react-json-view').then((m: unknown) => {
-    const mod = m as { default: { default: React.ComponentType<unknown> } }
+    const mod = m as { default: { default: React.ComponentType<any> } }
     return { default: mod.default.default }
   })
 )
@@ -100,13 +102,13 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
           collapsed={internalCollapsed}
           displayDataTypes={false}
           displayObjectSize={true}
-          enableClipboard={(copy) => {
+          enableClipboard={(copy: any) => {
             if (onSelectPath && copy.namespace) {
               navigator.clipboard.writeText(copy.namespace.join('.')).catch(() => {})
             }
             return true
           }}
-          onSelect={(select) => {
+          onSelect={(select: any) => {
             if (onSelectPath && select.namespace) {
               onSelectPath([...select.namespace.map(String), String(select.name)])
             }
@@ -119,7 +121,7 @@ export const JsonViewer: React.FC<JsonViewerProps> = ({
             padding:    0,
           }}
           shouldCollapse={searchQuery
-            ? (field) => {
+            ? (field: any) => {
                 const nameStr  = String(field.name ?? '')
                 const valueStr = typeof field.src === 'object' ? '' : String(field.src ?? '')
                 const q        = searchQuery.toLowerCase()
