@@ -1,0 +1,19 @@
+# Static FX Rates Lookup Table
+# Reference: Implementation Plan §6.1 step 2.
+#
+# Converts currencies to USD (base currency) for the demo.
+# Rates are static/fixed — no live API calls.
+
+base_currency: USD
+
+rates:
+  USD: 1.0
+  EUR: 1.08
+  GBP: 1.27
+  CAD: 0.74
+  AUD: 0.65
+  JPY: 0.0067
+  CHF: 1.12
+  INR: 0.012
+  SGD: 0.74
+  AED: 0.27

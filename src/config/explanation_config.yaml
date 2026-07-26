@@ -1,0 +1,155 @@
+# Explanation Component Configuration
+# Reference: Solution Design §5.6, §2.3, §3.1 principle 4
+#             Implementation Plan §6.5
+#
+# DOCUMENTED REQUIREMENTS implemented here:
+#   - Turn structured scores + top contributing features into a concise,
+#     query-grounded natural-language reason (§5.6)
+#   - Constrained to only numeric facts already computed (§5.6, §3.1 p.4)
+#   - LLM instructed to restate, never invent, numeric values (§6.5 step 2)
+#   - Post-generation number validation (§6.5 step 3)
+#   - 100% of numbers traceable to input payload (§6.5 DoD)
+#   - "templated NL generation" (§2.3)
+#
+# IMPLEMENTATION ASSUMPTIONS:
+#   - Templates stored here (your instruction); documentation does not specify
+#     a config file.
+#   - LLM path is optional; template is the default deterministic path.
+#   - Fall back to template if LLM validation fails (your instruction;
+#     documentation says "regenerate or flag on mismatch").
+#   - Number validation uses a regex-based check of all numbers in the
+#     LLM response against numbers in the input payload (§6.5 step 3).
+#
+# Template variable reference:
+#   {customer_id}          - customer identifier
+#   {risk_score}           - numeric anomaly score (0-1)
+#   {risk_band}            - Low / Medium / High
+#   {detection_method}     - rule_engine / statistical / ml / hybrid
+#   {aml_pattern}          - structuring / smurfing / layering / etc., or "anomalous activity"
+#   {feature_summary}      - prose summary of top contributing features
+#   {rule_condition}       - the rule condition string (rule_engine only)
+#   {determining_factor}   - the specific factor that set the risk band
+#   {recommended_action}   - escalation action (Monitor / Flag for review / Report (SAR draft))
+#   {escalation_rationale} - escalation rationale string
+
+# -----------------------------------------------------------------------
+# Default fallback template (used when none of the specific ones match)
+# IMPLEMENTATION ASSUMPTION: not explicitly required by docs.
+# -----------------------------------------------------------------------
+default_template: >-
+  Customer {customer_id} was assigned {risk_band} risk with a score of {risk_score}.
+  Detection method: {detection_method}.
+  {determining_factor}.
+  Recommended action: {recommended_action} — {escalation_rationale}.
+
+# -----------------------------------------------------------------------
+# Per-band templates
+# DOCUMENTED: §5.6 requires "concise, query-grounded natural-language reason"
+# -----------------------------------------------------------------------
+band_templates:
+  Low: >-
+    Customer {customer_id} was assessed as {risk_band} risk (score: {risk_score}).
+    The pattern analysed was {aml_pattern}.
+    {determining_factor}.
+    No immediate action required — {recommended_action}: {escalation_rationale}.
+
+  Medium: >-
+    Customer {customer_id} was flagged {risk_band} risk (score: {risk_score}).
+    Pattern of concern: {aml_pattern}.
+    Contributing evidence: {feature_summary}.
+    Risk determination: {determining_factor}.
+    Recommended action: {recommended_action} — {escalation_rationale}.
+
+  High: >-
+    Customer {customer_id} was flagged {risk_band} risk (score: {risk_score}).
+    Pattern detected: {aml_pattern}.
+    Contributing evidence: {feature_summary}.
+    Risk determination: {determining_factor}.
+    Recommended action: {recommended_action} — {escalation_rationale}.
+
+# -----------------------------------------------------------------------
+# Detection-method specific templates
+# IMPLEMENTATION ASSUMPTION: more precise templates per detection path.
+# The documented example (§5.6) is query-grounded and feature-specific.
+# -----------------------------------------------------------------------
+method_templates:
+  rule_engine: >-
+    Customer {customer_id} was flagged {risk_band} risk (score: {risk_score})
+    because they satisfied the condition: "{rule_condition}".
+    {determining_factor}.
+    Recommended action: {recommended_action} — {escalation_rationale}.
+
+  statistical: >-
+    Customer {customer_id} was flagged {risk_band} risk (score: {risk_score})
+    via statistical outlier detection on engineered AML features.
+    Contributing evidence: {feature_summary}.
+    {determining_factor}.
+    Recommended action: {recommended_action} — {escalation_rationale}.
+
+  ml: >-
+    Customer {customer_id} was flagged {risk_band} risk (score: {risk_score})
+    via ML-based unsupervised anomaly detection (IsolationForest + LOF).
+    Top contributing features: {feature_summary}.
+    {determining_factor}.
+    Recommended action: {recommended_action} — {escalation_rationale}.
+
+  hybrid: >-
+    Customer {customer_id} was flagged {risk_band} risk (score: {risk_score})
+    via hybrid detection (rule pre-filter + ML scoring).
+    Top contributing features: {feature_summary}.
+    {determining_factor}.
+    Recommended action: {recommended_action} — {escalation_rationale}.
+
+# -----------------------------------------------------------------------
+# Feature summary format
+# IMPLEMENTATION ASSUMPTION: how to format top_contributing_features prose.
+# -----------------------------------------------------------------------
+feature_summary:
+  max_features_shown: 3
+  # Template for each feature line:
+  feature_line_template: "{feature} = {value} (z-score: {z_score})"
+  feature_separator: "; "
+  feature_prefix: ""
+
+# -----------------------------------------------------------------------
+# LLM path configuration (IMPLEMENTATION ASSUMPTION — optional enhancement)
+# DOCUMENTED: §5.6 "LLM call, constrained to only numeric facts"
+#             §6.5 step 2 "instruct model to restate, never invent"
+#             §6.5 step 3 "post-generation number validation"
+# -----------------------------------------------------------------------
+llm:
+  enabled: false          # Set to true when ANTHROPIC_API_KEY is available
+  model: "claude-sonnet-4-20250514"
+  max_tokens: 300
+  temperature: 0.0        # IMPLEMENTATION ASSUMPTION: 0 for near-determinism
+
+  # DOCUMENTED §6.5 step 1: constrained prompt — only numeric facts
+  system_prompt: >-
+    You are an AML analyst generating factual explanations.
+    You must ONLY restate the facts provided to you.
+    You must NEVER invent numbers, scores, or details not in the data.
+    Be concise and precise. Use only the facts in the structured data provided.
+
+  user_prompt_template: >-
+    Generate a concise AML explanation for this customer using ONLY the facts below.
+    Do not invent any numbers or details not present in the data.
+
+    Customer ID: {customer_id}
+    Risk score: {risk_score}
+    Risk band: {risk_band}
+    Detection method: {detection_method}
+    AML pattern: {aml_pattern}
+    Determining factor: {determining_factor}
+    Top features: {feature_summary}
+    Recommended action: {recommended_action}
+    Action rationale: {escalation_rationale}
+
+    Write a single paragraph explanation. Use only the numbers provided above.
+
+  # DOCUMENTED §6.5 step 3: number validation
+  # IMPLEMENTATION ASSUMPTION: tolerance for floating point display
+  number_validation:
+    enabled: true
+    # If any number in the LLM response is NOT found in the input payload,
+    # the response is discarded and the template fallback is used.
+    float_tolerance: 0.01

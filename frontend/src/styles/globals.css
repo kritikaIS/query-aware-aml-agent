@@ -1,0 +1,129 @@
+/*
+ * Global Styles
+ * Documented Requirement: §4 Design System, §10 Accessibility, §9 Responsive
+ */
+
+/* Import design tokens first */
+@import './tokens.css';
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base reset & root styles ─────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--border-hairline);
+  }
+
+  html {
+    color-scheme: dark;
+    background-color: var(--bg-void);
+    color: var(--text-primary);
+    /* Accessibility: smooth scroll unless reduced motion (§10) */
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 400;
+    background-color: var(--bg-void);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /*
+   * Documented Requirement (§4.2): monospace reserved strictly for
+   * machine-generated values — customer IDs, scores, timestamps, JSON.
+   * Applied via .font-mono utility. Applied globally to code/pre/kbd.
+   */
+  code, pre, kbd, samp,
+  [data-value="machine"] {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+  }
+
+  /* Focus rings: accent-cyan per §4.1 */
+  :focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: rgba(62, 214, 196, 0.2);
+    color: var(--text-primary);
+  }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-void);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-hairline);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+}
+
+/* ── Component utilities ──────────────────────────────────────────── */
+@layer components {
+  /* Panel surface with hairline border + inset shadow (§4.3 glassmorphism rule) */
+  .panel {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-panel), var(--shadow-inset);
+    border-radius: var(--radius-lg);
+  }
+
+  .panel-raised {
+    background-color: var(--bg-panel-raised);
+    border: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-raised), var(--shadow-inset);
+    border-radius: var(--radius-lg);
+  }
+
+  /* 12-column grid with 24px gutters (§4.3) */
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  /* Hairline divider */
+  .divider {
+    border-top: 1px solid var(--border-hairline);
+  }
+
+  /* Cyan cursor glow — query input (§5.1) */
+  .cursor-glow:focus {
+    box-shadow: var(--shadow-cyan-glow);
+  }
+}
+
+/* ── Accessibility: prefers-reduced-motion (§7.3, §10) ─────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

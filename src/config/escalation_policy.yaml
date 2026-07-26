@@ -1,0 +1,16 @@
+# Escalation Policy Configuration
+# Reference: Solution Design §5.7, Implementation Plan §6.6.
+#
+# Deterministic mapping from risk band to recommended action.
+# This is a pure lookup table — no LLM involvement.
+
+policy:
+  High:
+    recommended_action: "Report (SAR draft)"
+    rationale: "Auto-draft Suspicious Activity Report for compliance sign-off"
+  Medium:
+    recommended_action: "Flag for review"
+    rationale: "Analyst review within SLA (e.g. 3 business days)"
+  Low:
+    recommended_action: "Monitor"
+    rationale: "No further action; keep in rolling watch list"

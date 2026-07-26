@@ -1,0 +1,90 @@
+# ML Anomaly Detection Configuration
+# Reference: Solution Design §5.4, Implementation Plan §6.3 step 3.
+# Libraries: scikit-learn, PyOD (documented in §6.3, §7).
+#
+# Documented requirements:
+#   - IsolationForest on the pattern-specific feature set
+#   - LocalOutlierFactor on the pattern-specific feature set
+#   - Top contributing features via IsolationForest path-length attribution
+#     OR per-feature z-scores as a lightweight explainability proxy
+#   - anomaly_score (0–1) per entity
+#   - Unsupervised: no labeled fraud examples required
+#
+# library_note:
+#   §6.3 and §7 list both scikit-learn and PyOD as libraries for this path.
+#   IsolationForest and LocalOutlierFactor are the two explicitly documented
+#   algorithms (§5.4, §6.3) and are available in scikit-learn.
+#   PyOD is installed in requirements.txt and available for additional
+#   ensemble anomaly detectors (e.g. COPOD, ECOD) in future. This is
+#   documented here for auditability — it is not a functional deviation.
+#
+# -----------------------------------------------------------------------
+# IsolationForest hyperparameters
+# -----------------------------------------------------------------------
+#
+# if_n_estimators:
+#   IMPLEMENTATION ASSUMPTION — §6.3 specifies IsolationForest but not the
+#   number of trees. 100 is the scikit-learn default; higher values increase
+#   stability at the cost of compute.
+#
+# if_contamination:
+#   IMPLEMENTATION ASSUMPTION — Fraction of the dataset expected to be
+#   anomalous. Used by scikit-learn to set the decision threshold.
+#   'auto' uses the theoretical threshold; a float (e.g. 0.1) sets it
+#   explicitly. Externalized so it can be tuned per deployment context.
+#
+# if_random_state:
+#   IMPLEMENTATION ASSUMPTION — Fixed integer seed to ensure reproducibility.
+#   The documentation requires deterministic outputs (Solution Design §3.1
+#   principle 4: "Numbers come from code"). Not specified in documentation;
+#   any fixed value produces deterministic results.
+#
+# -----------------------------------------------------------------------
+# LocalOutlierFactor hyperparameters
+# -----------------------------------------------------------------------
+#
+# lof_n_neighbors:
+#   IMPLEMENTATION ASSUMPTION — Number of neighbors used to estimate local
+#   density. scikit-learn default is 20; must be < n_samples. Externalized
+#   because small cohorts (e.g. single-customer queries) require small values.
+#
+# lof_contamination:
+#   IMPLEMENTATION ASSUMPTION — Same role as if_contamination for LOF.
+#
+# -----------------------------------------------------------------------
+# Score combination
+# -----------------------------------------------------------------------
+#
+# score_combination:
+#   IMPLEMENTATION ASSUMPTION — §5.4 says to run both IsolationForest and LOF
+#   but does not specify how to combine their scores into a single anomaly_score.
+#   "mean" averages the two normalised scores. Alternatives: "max" (union of
+#   flags), "if_only", "lof_only". Externalized for tuning.
+#
+# -----------------------------------------------------------------------
+# Explainability
+# -----------------------------------------------------------------------
+#
+# explainability_method:
+#   DOCUMENTED REQUIREMENT: §6.3 step 3 says "per-feature z-scores as a
+#   lightweight explainability proxy". This is used as the default because
+#   true path-length attribution (tracking per-feature depth in each tree)
+#   requires custom implementation beyond scikit-learn's public API.
+#   §5.4 says "IsolationForest path-length attribution OR per-feature z-scores"
+#   — "zscore_proxy" is the documented alternative.
+#   Supported values: "zscore_proxy"
+#
+# top_n_features:
+#   IMPLEMENTATION ASSUMPTION — number of top contributing features to return.
+
+if_n_estimators: 100
+if_contamination: "auto"
+if_random_state: 42
+
+lof_n_neighbors: 3
+lof_contamination: "auto"
+
+score_combination: "mean"
+
+explainability_method: "zscore_proxy"
+top_n_features: 5

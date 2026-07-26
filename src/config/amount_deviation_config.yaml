@@ -1,0 +1,54 @@
+# Amount Deviation Feature Engineering Configuration
+# Reference: Solution Design §5.3, Implementation Plan §6.2 step 5.
+#
+# Documented constructs:
+#   - z-score of transaction amount vs. that customer's historical mean/std
+#   - deviation from peer-group (segment) norms
+#
+# historical_interpretation:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.3 says "z-score of
+#   transaction amount vs. that customer's historical mean/std." The word
+#   "historical" does not specify whether this means a separate prior-period
+#   baseline, a rolling window, or the full dataset currently under analysis.
+#   This implementation computes mean/std from all transactions in the
+#   filtered dataset passed to this function (i.e., what the Data Loader
+#   has already scoped via QuerySpec filters). This is consistent with how
+#   all other feature families operate on the already-filtered output.
+#   If a separate historical baseline is required in future, this
+#   interpretation must be revisited and this file updated accordingly.
+#
+# min_transactions_for_customer_zscore:
+#   IMPLEMENTATION ASSUMPTION — "z-score vs. that customer's historical mean/std"
+#   is undefined when the customer has fewer than 2 transactions (std = 0 or NaN).
+#   This is the minimum number of transactions required to compute a meaningful
+#   per-customer z-score. Customers below this threshold receive 0.0 for all
+#   customer z-score features (no detectable deviation).
+#
+# min_transactions_for_segment_zscore:
+#   IMPLEMENTATION ASSUMPTION — Per-segment z-score requires at least 2 transactions
+#   in the segment to compute a non-zero std. Segments with fewer transactions
+#   receive 0.0 for segment z-score features.
+#
+# zscore_aggregations:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.3 says "z-score of transaction
+#   amount" without specifying how to aggregate per-transaction z-scores into a
+#   per-customer summary. Both mean and max of absolute z-scores are computed:
+#   - mean: typical deviation level for this customer.
+#   - max: single most extreme transaction (worst-case outlier signal).
+#   Adding or removing an aggregation here changes the computed feature columns.
+#
+# use_absolute_zscore:
+#   IMPLEMENTATION ASSUMPTION — Whether to take the absolute value before
+#   aggregating. True means we measure magnitude of deviation (either direction
+#   is equally suspicious); False would preserve sign (positive = above mean,
+#   negative = below mean). True is standard for AML outlier detection since
+#   both unusually large and unusually small transactions can be suspicious.
+
+min_transactions_for_customer_zscore: 2
+min_transactions_for_segment_zscore: 2
+
+zscore_aggregations:
+  - mean
+  - max
+
+use_absolute_zscore: true

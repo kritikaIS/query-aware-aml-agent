@@ -1,0 +1,78 @@
+# Risk Classification Configuration
+# Reference: Solution Design §5.5, Implementation Plan §6.4.
+#
+# Documented requirements:
+#   - percentile-based thresholds within the filtered cohort
+#   - top 5% = High, next 15% = Medium (documented as "e.g." values)
+#   - any exact rule-engine match → minimum Medium
+#   - any prior-SAR flag on entity (customers.csv kyc_flags) → minimum High
+#   - return risk band, underlying continuous score, determining factor
+#
+# high_percentile:
+#   IMPLEMENTATION ASSUMPTION with documented example — Solution Design §5.5
+#   states "e.g. top 5% = High". The "e.g." means this is illustrative, not
+#   mandatory. This value is externalized so it can be tuned per deployment
+#   context without changing code.
+#
+# medium_percentile:
+#   IMPLEMENTATION ASSUMPTION with documented example — Solution Design §5.5
+#   states "next 15% = Medium", implying the medium band starts at the 80th
+#   percentile (100% - 5% - 15% = 80%). Externalized for the same reason.
+#
+# prior_sar_kyc_flag_values:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.5 states "any prior SAR
+#   filing on the entity (from customers.csv.kyc_flags) → minimum High" but
+#   does not specify what string value in kyc_flags indicates a prior SAR.
+#   These are the substrings checked (case-insensitive) in the kyc_flags
+#   field. Externalized so new flag types can be added without code changes.
+#
+# bands:
+#   DOCUMENTED REQUIREMENT — The three risk bands (Low, Medium, High) are
+#   explicitly named in Solution Design §5.5, §5.7, and §8.
+#   Order is significant: index 0 = lowest, 2 = highest (used in override
+#   logic to ensure "minimum Medium" and "minimum High" are enforced correctly).
+
+high_percentile: 95
+medium_percentile: 80
+
+prior_sar_kyc_flag_values:
+  - "prior_sar"
+  - "sar"
+  - "suspicious_activity_report"
+  - "prior_flag"
+  - "watchlist"
+
+# min_cohort_for_percentile:
+#   USER-REQUESTED ENHANCEMENT — Not mentioned in the documentation.
+#   When the filtered cohort is very small, numpy percentile produces thresholds
+#   equal to actual data values, which can cause all-High or unexpected results.
+#   This is the minimum cohort size below which the fallback strategy activates.
+#   Externalized so it can be adjusted without code changes.
+#
+# small_cohort_fallback:
+#   USER-REQUESTED ENHANCEMENT — Not mentioned in the documentation.
+#   Defines the fallback band assignment strategy when cohort size < min_cohort_for_percentile.
+#   Supported values:
+#     "score_only": assign bands by absolute score thresholds (score_high_absolute,
+#                   score_medium_absolute) rather than percentile, ensuring a
+#                   sensible spread even for tiny cohorts.
+#   This fallback is deterministic and does not change the public API.
+#   It is isolated from the documented percentile logic.
+#
+# score_high_absolute:
+#   USER-REQUESTED ENHANCEMENT — Absolute threshold used when small_cohort_fallback="score_only".
+#   Scores at or above this value → High. Not used when cohort >= min_cohort_for_percentile.
+#
+# score_medium_absolute:
+#   USER-REQUESTED ENHANCEMENT — Absolute threshold used when small_cohort_fallback="score_only".
+#   Scores at or above this value (but below score_high_absolute) → Medium.
+
+bands:
+  - "Low"
+  - "Medium"
+  - "High"
+
+min_cohort_for_percentile: 5
+small_cohort_fallback: "score_only"
+score_high_absolute: 0.75
+score_medium_absolute: 0.40

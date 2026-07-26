@@ -1,0 +1,44 @@
+# Rule Engine Configuration
+# Reference: Solution Design §5.4, Implementation Plan §6.3 step 1.
+#
+# Documented requirement: Rule engine implements "direct threshold/count logic"
+# and takes the explicit_rule.condition string from the QuerySpec.
+#
+# anomaly_score_on_hit:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.4 specifies that the Anomaly
+#   Detection Tool output includes an "anomaly_score (0–1) per entity" but does
+#   not define what score to assign when a rule matches. 1.0 is used because a
+#   deterministic rule match is a definitive hit (maximum confidence).
+#
+# anomaly_score_on_miss:
+#   IMPLEMENTATION ASSUMPTION — Score assigned when a customer does not satisfy
+#   the rule. 0.0 means no anomaly detected by this rule.
+#
+# amount_column:
+#   IMPLEMENTATION ASSUMPTION — The documentation's example condition uses
+#   "amount" without specifying which column. Per clarification, this refers
+#   to the canonical normalized monetary field produced by the Data Loader.
+#   The Data Loader produces "amount_normalized" (base-currency converted).
+#   This is externalized so it can be changed if the column name differs.
+#
+# amount_condition_semantics:
+#   IMPLEMENTATION ASSUMPTION — The documentation does not specify whether
+#   "amount < X" in a rule condition means ALL of a customer's transactions
+#   satisfy the condition, or ANY one of them does. This implementation uses
+#   ALL semantics, consistent with the reference query "Which customers made
+#   10+ transactions under $10,000?" — the phrase "10+ transactions under
+#   $10,000" implies every one of those transactions is under $10,000.
+#   If ANY semantics were required, this config key should be changed and
+#   the evaluator updated accordingly.
+#
+# count_column_alias:
+#   IMPLEMENTATION ASSUMPTION — The documentation's example uses
+#   "count(transactions)" without defining its meaning. Per clarification,
+#   this means the number of transactions for each customer in the DataFrame
+#   passed to the rule engine. This key documents that alias for auditability.
+
+anomaly_score_on_hit: 1.0
+anomaly_score_on_miss: 0.0
+
+amount_column: "amount_normalized"
+count_column_alias: "count(transactions)"

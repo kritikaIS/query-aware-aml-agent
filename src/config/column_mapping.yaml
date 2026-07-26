@@ -1,0 +1,72 @@
+# Column Mapping Configuration
+# Reference: Solution Design §6.1, Implementation Plan §6.1.
+#
+# Maps arbitrary source column names to the internal schema.
+# The Data Loader Tool uses this to normalize any input dataset
+# to the expected internal schema before downstream tools process it.
+
+transactions:
+  # Internal field name: list of possible source column names (first match wins)
+  transaction_id:
+    - transaction_id
+    - txn_id
+    - id
+  customer_id:
+    - customer_id
+    - cust_id
+    - account_id
+  timestamp:
+    - timestamp
+    - date
+    - transaction_date
+    - txn_date
+  amount:
+    - amount
+    - transaction_amount
+    - txn_amount
+  currency:
+    - currency
+    - ccy
+  transaction_type:
+    - transaction_type
+    - type
+    - txn_type
+  counterparty_id:
+    - counterparty_id
+    - beneficiary_id
+    - receiver_id
+  counterparty_country:
+    - counterparty_country
+    - beneficiary_country
+  channel:
+    - channel
+    - transaction_channel
+
+customers:
+  customer_id:
+    - customer_id
+    - cust_id
+  name_hash:
+    - name_hash
+    - name
+  account_open_date:
+    - account_open_date
+    - open_date
+    - account_opened
+  segment:
+    - segment
+    - customer_segment
+  country:
+    - country
+    - nationality
+  occupation:
+    - occupation
+    - job_title
+  risk_rating_existing:
+    - risk_rating_existing
+    - existing_risk_rating
+    - risk_rating
+  kyc_flags:
+    - kyc_flags
+    - kyc_status
+    - flags

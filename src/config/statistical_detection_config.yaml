@@ -1,0 +1,57 @@
+# Statistical Detection Configuration
+# Reference: Solution Design §5.4, Implementation Plan §6.3 step 2.
+#
+# Documented requirements:
+#   - z-score outlier detection on engineered features
+#   - IQR outlier detection on engineered features
+#   - Return exact feature and threshold that triggered the flag
+#   - Return anomaly_score (0–1) per entity
+#   - Return top contributing features via simple feature z-scores
+#   - Library: scipy.stats (§6.3)
+#
+# library_note:
+#   Implementation Plan §6.3 lists scipy.stats as the library for this path.
+#   The statistical computations (mean, std, percentile) are implemented using
+#   numpy, which produces identical numerical results for these operations.
+#   scipy is installed in requirements.txt and available for future use.
+#   This is documented here for auditability — it is not a functional deviation.
+#
+# z_score_threshold:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.4 specifies "z-score
+#   outlier detection on engineered features" without defining the threshold.
+#   2.0 is a standard statistical threshold (approximately the 95th percentile
+#   of a standard normal distribution). Externalized so it can be tuned.
+#
+# iqr_multiplier:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.4 specifies "IQR outlier
+#   detection" without defining the multiplier. 1.5 is the standard Tukey
+#   fence multiplier for mild outliers. 3.0 is used for extreme outliers.
+#   Externalized so it can be tuned.
+#
+# score_scale_factor:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.4 specifies "anomaly_score
+#   (0–1) per entity" for the statistical method but does not specify how
+#   per-feature z-scores are mapped to a single score.
+#   This implementation maps:
+#     anomaly_score = min(max_abs_z_score / score_scale_factor, 1.0)
+#   where max_abs_z_score is the maximum |z| across all features for the entity.
+#   A score_scale_factor equal to z_score_threshold means:
+#   score = 1.0 at the boundary where z = threshold (the most extreme flagged case).
+#   Externalized so the mapping can be adjusted independently of the flag threshold.
+#
+# min_cohort_size_for_zscore:
+#   IMPLEMENTATION ASSUMPTION — z-score is undefined when the cohort has fewer
+#   than 2 entities (std = 0 or undefined). This is the minimum number of
+#   entities in the features DataFrame required to compute a valid z-score.
+#   Features with insufficient cohort size are skipped.
+#
+# top_n_features:
+#   IMPLEMENTATION ASSUMPTION — "top contributing features" (§5.4) does not
+#   specify how many to return. The top N features by absolute z-score are
+#   returned. Externalized so the count can be adjusted.
+
+z_score_threshold: 2.0
+iqr_multiplier: 1.5
+score_scale_factor: 2.0
+min_cohort_size_for_zscore: 2
+top_n_features: 5

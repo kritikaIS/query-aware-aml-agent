@@ -1,0 +1,78 @@
+/*
+ * Design Token System — "Compliance Dark" Theme
+ * Documented Requirement: §4.1 Color Palette, §4.2 Typography, §4.3 Spacing & Grid
+ * All Tailwind color utilities reference these variables.
+ * No hardcoded hex values anywhere else in the codebase.
+ */
+
+:root {
+  /* ── Backgrounds (§4.1) ──────────────────────────────────────── */
+  --bg-void:          #0A0E14;  /* App background */
+  --bg-panel:         #111826;  /* Card / panel surface */
+  --bg-panel-raised:  #161F30;  /* Elevated card (active tool, hovered row) */
+
+  /* ── Borders (§4.1) ─────────────────────────────────────────── */
+  --border-hairline:  #232D42;  /* Card borders, dividers */
+
+  /* ── Text (§4.1) ────────────────────────────────────────────── */
+  --text-primary:     #E8ECF4;  /* Headings, primary values */
+  --text-secondary:   #8B98B4;  /* Labels, captions, metadata */
+
+  /* ── Accent (§4.1) ──────────────────────────────────────────── */
+  --accent-cyan:      #3ED6C4;  /* Agent "active thinking" accent, links, focus rings */
+  --accent-violet:    #7C6CF6;  /* LLM/planning-related elements */
+
+  /* ── Risk bands (§4.1) ───────────────────────────────────────── */
+  /* Only saturated signal colors; everything else stays desaturated */
+  --risk-low:         #2FBF71;  /* Low risk */
+  --risk-medium:      #F5B93D;  /* Medium risk */
+  --risk-high:        #F0473C;  /* High risk */
+
+  /* ── Disabled / skipped (§4.1) ──────────────────────────────── */
+  --skipped-grey:     #3A445C;  /* Skipped-tool cards, disabled states */
+
+  /* ── Spacing: 8px base unit (§4.3) ─────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;   /* base unit */
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;  /* gutter */
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Motion tokens (§7.1) ────────────────────────────────────── */
+  --motion-instant:    100ms;
+  --motion-fast:       180ms;
+  --motion-base:       300ms;
+  --motion-slow:       500ms;
+  --motion-stream:     28ms;    /* per-character for typewriter (20–35ms range, §7.1) */
+  --motion-ease-out:   cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-inout: ease-in-out;
+
+  /* ── Z-index ladder ──────────────────────────────────────────── */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-overlay: 20;
+  --z-drawer:  30;
+  --z-modal:   40;
+  --z-tooltip: 50;
+  --z-topbar:  60;
+
+  /* ── Border radius ───────────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-2xl:  16px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ─────────────────────────────────────────────────── */
+  --shadow-panel:    0 1px 3px 0 rgba(0,0,0,0.4), 0 1px 2px -1px rgba(0,0,0,0.4);
+  --shadow-raised:   0 4px 12px 0 rgba(0,0,0,0.5);
+  --shadow-overlay:  0 8px 32px 0 rgba(0,0,0,0.6);
+  --shadow-inset:    inset 0 1px 0 0 rgba(255,255,255,0.04);
+  --shadow-cyan-glow: 0 0 12px 2px rgba(62,214,196,0.25);
+}

@@ -1,0 +1,25 @@
+# API Configuration
+# Reference: Solution Design §7, Implementation Plan §6.8.
+#
+# DOCUMENTED REQUIREMENTS:
+#   - FastAPI backend exposing /query endpoint (§7)
+#   - POST /query accepting {"query": str} (§6.8 step 1)
+#   - Returns full ExecutionReport JSON (§6.8 step 1)
+#
+# IMPLEMENTATION ASSUMPTIONS:
+#   - Port, host, CORS origins, title, version: not specified in documentation.
+#   - All externalised here so they can be changed without code changes.
+
+title: "AML Suspicious Activity Detection Agent"
+description: "AI-powered AML compliance agent — query-aware, non-sequential pipeline"
+version: "1.0.0"
+
+host: "0.0.0.0"
+port: 8000
+
+# CORS — allow all origins for hackathon demo
+cors_origins:
+  - "*"
+
+# Request validation
+max_query_length: 2000

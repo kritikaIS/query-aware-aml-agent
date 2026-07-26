@@ -1,0 +1,18 @@
+# Structuring / Smurfing Feature Engineering Configuration
+# Reference: Solution Design §5.3, Implementation Plan §6.2 step 2.
+#
+# reporting_threshold:
+#   DOCUMENTED. Solution Design §5.3 explicitly states "count of
+#   transactions just below reporting threshold (e.g. $10,000)."
+#   This is the standard BSA/CTR reporting threshold amount.
+#
+# near_threshold_lower_bound_ratio:
+#   IMPLEMENTATION ASSUMPTION — NOT specified in the documentation.
+#   The documentation says "just below" the threshold without a precise
+#   quantitative lower bound. This ratio defines the lower edge of the
+#   "near-threshold" band as a fraction of reporting_threshold.
+#   Example: 0.80 means transactions in [$8,000, $10,000) are considered
+#   near-threshold. This value can be tuned here without any code change.
+
+reporting_threshold: 10000.00
+near_threshold_lower_bound_ratio: 0.80

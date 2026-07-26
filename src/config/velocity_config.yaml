@@ -1,0 +1,40 @@
+# Velocity Feature Engineering Configuration
+# Reference: Solution Design §5.3, Implementation Plan §6.2 step 3.
+#
+# time_buckets:
+#   IMPLEMENTATION ASSUMPTION — NOT explicitly specified in the documentation.
+#   Solution Design §5.3 states "transaction frequency per customer per time
+#   bucket" without naming the buckets. These are chosen to be consistent with
+#   the rolling windows used in the structuring family (24h/7d/30d) for
+#   comparability. They are externalized here so they can be changed without
+#   touching Python code.
+#
+# delta_unit:
+#   IMPLEMENTATION ASSUMPTION — The documentation says "inter-transaction time
+#   deltas" without specifying units. Seconds is chosen as the base unit
+#   because it is the most granular without losing information, and results
+#   are interpretable (e.g. delta_min=5 means two txns within 5 seconds).
+#
+# delta_statistics:
+#   IMPLEMENTATION ASSUMPTION — The documentation says "inter-transaction time
+#   deltas" (plural) without specifying which statistics to compute. mean, min,
+#   max are chosen because they capture the three distinct AML signals:
+#   - mean: overall pacing; low mean = unusually rapid account overall.
+#   - min: fastest back-to-back pair; near-zero min = machine-speed activity.
+#   - max: longest dormant gap; contextualizes burst vs. dormant intervals.
+#   Adding or removing a statistic here changes the computed feature columns.
+
+time_buckets:
+  - label: "24h"
+    hours: 24
+  - label: "7d"
+    hours: 168
+  - label: "30d"
+    hours: 720
+
+delta_unit: seconds
+
+delta_statistics:
+  - mean
+  - min
+  - max

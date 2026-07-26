@@ -1,0 +1,50 @@
+# Layering Feature Engineering Configuration
+# Reference: Solution Design §5.3, Implementation Plan §6.2 step 4.
+#
+# Documented constructs:
+#   - counterparty network depth / hop count (→ direct_counterparty_count)
+#   - fan-in / fan-out ratios
+#   - rapid pass-through balance (funds in ≈ funds out within short window)
+#
+# passthrough_window_hours:
+#   IMPLEMENTATION ASSUMPTION — Solution Design §5.3 says "rapid pass-through
+#   balance (funds in ≈ funds out within short window)" without defining
+#   "short window." This is the duration of the rolling window used to compare
+#   funds-in vs. funds-out for the passthrough_ratio feature.
+#
+# passthrough_tolerance:
+#   IMPLEMENTATION ASSUMPTION — "funds in ≈ funds out" does not quantify "≈".
+#   The feature engineering step computes passthrough_ratio as a continuous
+#   value: min(amount_in, amount_out) / max(amount_in, amount_out).
+#   This tolerance value (0.8 = within 20%) is provided here for reference
+#   by downstream consumers (e.g., the Anomaly Detection tool) that want to
+#   apply a threshold to classify the continuous ratio. It is NOT applied
+#   during feature engineering — the raw continuous ratio is always returned.
+#
+# hop_count_interpretation:
+#   IMPLEMENTATION ASSUMPTION — "counterparty network depth / hop count"
+#   (Solution Design §5.3) is computed as the count of distinct direct
+#   counterparties per customer. The transaction schema provides only a
+#   direct counterparty_id per transaction (one hop); multi-hop graph
+#   traversal would require counterparty-to-counterparty edge data not
+#   available in this schema. The column is therefore named
+#   direct_counterparty_count to be technically accurate.
+#
+# incoming_transaction_types / outgoing_transaction_types:
+#   IMPLEMENTATION ASSUMPTION — "funds in" and "funds out" are not explicitly
+#   defined. These lists classify which transaction_type values count as
+#   incoming vs. outgoing for the fan-in/fan-out and pass-through calculations.
+
+passthrough_window_hours: 24
+
+passthrough_tolerance: 0.8
+
+incoming_transaction_types:
+  - deposit
+
+outgoing_transaction_types:
+  - withdrawal
+  - transfer
+  - atm
+
+hop_count_interpretation: "distinct_direct_counterparties"

@@ -1,0 +1,5 @@
+customer_id,name_hash,account_open_date,segment,country,occupation,risk_rating_existing,kyc_flags
+4521,hash_a1b2c3,2020-03-15,retail,US,self_employed,medium,
+7832,hash_d4e5f6,2019-08-22,retail,DE,freelancer,low,
+9001,hash_g7h8i9,2015-01-10,corporate,US,ceo,low,
+1234,hash_j0k1l2,2022-06-01,retail,GB,student,low,

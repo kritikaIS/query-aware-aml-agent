@@ -1,0 +1,33 @@
+# Escalation Policy Configuration
+# Reference: Solution Design §5.7, Implementation Plan §6.6.
+#
+# DOCUMENTED REQUIREMENTS:
+#   - Pure lookup table: risk band → recommended action (§5.7, §6.6 step 1)
+#   - No LLM involvement (§5.5, §6.6 step 1)
+#   - Human-readable rationale string shown to reviewer (§5.7, §6.6 step 2)
+#   - Table-driven: adding a new band/action requires only a config change (§6.6 DoD)
+#
+# The three risk bands, their actions, and their rationale strings are all
+# DOCUMENTED REQUIREMENTS from Solution Design §5.7.
+#
+# IMPLEMENTATION ASSUMPTIONS:
+# - YAML key structure (band → {action, rationale}) is not specified in the
+#   documentation; this layout satisfies the DoD with a one-line change.
+# - Field names (recommended_action, rationale) are implementation choices;
+#   the semantics are documented.
+#
+# To add a new band/action: add one entry under 'policy' and no code changes
+# are required — satisfying the documented DoD.
+
+policy:
+  Low:
+    recommended_action: "Monitor"
+    rationale: "No further action; keep in rolling watch list"
+
+  Medium:
+    recommended_action: "Flag for review"
+    rationale: "Analyst review within SLA (e.g. 3 business days)"
+
+  High:
+    recommended_action: "Report (SAR draft)"
+    rationale: "Auto-draft Suspicious Activity Report for compliance sign-off"
